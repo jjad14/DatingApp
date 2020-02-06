@@ -51,7 +51,7 @@ namespace DatingApp.API.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
-        {
+        {            
             //checking to make sure that we have a user, and that their username and password matches whats stored in the database for that particular user
             //userForLoginDto is in lower case so we are always attmepting to login with a lowercase username
             var userFromRepo = await _repo.Login(userForLoginDto.Username.ToLower(), userForLoginDto.Password);
