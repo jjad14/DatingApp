@@ -7,8 +7,12 @@ namespace DatingApp.API.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options){}
 
+        //names of tables inside our database - uses migrations dotnet ef migrations add NAEM
         public DbSet<Value> Values { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Photo> Photos { get; set; }
+
+
 
 
     }
