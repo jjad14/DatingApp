@@ -15,6 +15,8 @@ export class MemberEditComponent implements OnInit {
   // child element needed to reset after save changes is clicked
   @ViewChild('editForm', {static: true}) editForm: NgForm;
   user: User;
+  photoUrl: string;
+
   // if user closes window when form is dirty
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
@@ -33,6 +35,7 @@ export class MemberEditComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.user = data['user'];
     });
+    this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
   updateUser() {
@@ -43,6 +46,10 @@ export class MemberEditComponent implements OnInit {
       this.alertify.error(error);
     });
 
+  }
+
+  updateMainPhoto(photoUrl) {
+    this.user.photoUrl = photoUrl;
   }
 
 

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/environments/environment';
+import { User } from '../_models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +13,16 @@ export class AuthService {
   baseUrl = environment.apiUrl + 'auth/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
+  currentUser: User;
+  photoUrl = new BehaviorSubject<string>('../..//assets/user.png');
+  currentPhotoUrl = this.photoUrl.asObservable();
 
 constructor(private http: HttpClient) { }
+
+  // method to update our photo with the next photo so when the user changes the main photo, this method is called
+  ChangeMemberPhoto(photoUrl: string) {
+    this.photoUrl.next(photoUrl);
+  }
 
   /* when the token comes back from the server, it comes back as an Observable,
   in order to do something with the token we need to use our rxjs operators
@@ -26,8 +36,10 @@ constructor(private http: HttpClient) { }
 
           if (user) { // we want to store the token locally for easy access
               localStorage.setItem('token', user.token);
+              localStorage.setItem('user', JSON.stringify(user.user));
               this.decodedToken = this.jwtHelper.decodeToken(user.token);
-              console.log(this.decodedToken);
+              this.currentUser = user.user;
+              this.ChangeMemberPhoto(this.currentUser.photoUrl);
           }
         })
       );

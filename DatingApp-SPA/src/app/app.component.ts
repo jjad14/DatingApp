@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './_services/auth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { User } from './_models/user';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +16,14 @@ export class AppComponent implements OnInit {
   // get token from local storage, if it exists then set the decoded token in the authservice to that token (decoded)
   ngOnInit() {
     const token = localStorage.getItem('token');
-
+    const user: User = JSON.parse(localStorage.getItem('user'));
     if (token) {
       this.authService.decodedToken = this.jwtHelper.decodeToken(token);
+    }
+
+    if (user) {
+      this.authService.currentUser = user;
+      this.authService.ChangeMemberPhoto(user.photoUrl);
     }
   }
 }

@@ -25,8 +25,8 @@ namespace DatingApp.API.Data
         //controller will return 401 response for null cases
         public async Task<User> Login(string username, string password)
         {
-            //find user by username, FirstOrDefaultAsync returns the username or null
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            //find user by username, FirstOrDefaultAsync returns the username and includes the photos or null
+            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Username == username);
 
             //if user is null, no user exists with parameter username
             if(user == null)
