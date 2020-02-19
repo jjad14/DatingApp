@@ -6,6 +6,7 @@ using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Dtos;
 using DatingApp.API.Helpers;
+using DatingApp.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,6 +89,45 @@ namespace DatingApp.API.Controllers
             throw new Exception($"Updating user {id} failed on save");
         }
 
+        // recipient Id is the id the user likes
+        [HttpPost("{id}/like/{recipientId}")]
+        public async Task<IActionResult> LikeUser(int id, int recipientId)
+        {
+            // we need to compare the id of the path to the users id thats being passed in as part of their token
+            // if the user id doesnt match the id in the token then an unauthrorized is given
+            if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)) {
+                return Unauthorized();
+            }
+
+            // attempt to get a like from the repo
+            var like = await _repo.GetLike(id, recipientId);
+
+            // if like is not null, this means theres already a like in place for this user
+            if (like != null) 
+                return BadRequest("You already liked this user");
+
+            // check if recipient of the like exists
+            if (await _repo.GetUser(recipientId) == null) 
+                return NotFound();
+
+            like = new Like 
+            {
+                LikerId = id,
+                LikeeId = recipientId
+            };
+
+            // synchronous call, stored in memory (our repo), not in database yet
+            _repo.Add<Like>(like);
+
+            // asynchronous, saving to database
+            if (await _repo.SaveAll())
+                return Ok();
+
+            return BadRequest("Failed to like user");
+
+
+
+        }
 
     }
 }

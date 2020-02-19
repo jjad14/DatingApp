@@ -65,6 +65,18 @@ namespace DatingApp.API.Data
             // get all users of the opposite gender
             users = users.Where(u => u.Gender == userParams.Gender);
 
+            if(userParams.Likers)
+            {
+                var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u => userLikers.Contains(u.Id));
+            }
+
+            if (userParams.Likees)
+            {
+                var userLikess = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u => userLikess.Contains(u.Id));
+            }
+
             if (userParams.MinAge != 18 || userParams.MaxAge != 99) 
             {
                 var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
@@ -89,10 +101,35 @@ namespace DatingApp.API.Data
             return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
         }
 
+        private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
+        {
+            // get the logged in user that includes the likes and likees collection
+            var user = await _context.Users
+                .Include(x => x.Likers)
+                .Include(x => x.Likees)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            // return all the users that have liked the currently logged in user
+            if(likers) 
+            {
+                // we dont want to return a collection of users but instead a collection of ints, so we use select 
+                return user.Likers.Where(u => u.LikeeId == id).Select(i => i.LikerId);
+            }
+            else // return all the users that the currently logged in user has liked
+            {
+                return user.Likees.Where(u => u.LikerId == id).Select(i => i.LikeeId);
+            }
+        }
+
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<Like> GetLike(int userId, int recipientId)
+        {
+            // test - get first or defaults where the user id matches the liker id and the recipient id matches the likee id
+            return await _context.Likes.FirstOrDefaultAsync(u => u.LikerId == userId && u.LikeeId == recipientId);
+        }
     }
 }
