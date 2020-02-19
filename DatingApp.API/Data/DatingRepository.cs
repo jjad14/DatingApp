@@ -52,7 +52,7 @@ namespace DatingApp.API.Data
             return user;
         }
 
-        // return list of users
+        // return list of users with their photos
         public async Task<IEnumerable<User>> GetUsers()
         {
             var users = await _context.Users.Include(p => p.Photos).ToListAsync();

@@ -5,7 +5,7 @@ using DatingApp.API.Models;
 
 namespace DatingApp.API.Helpers
 {
-    // Auto Mapper uses profilesto help understand the source and the destination of what is mapping
+    // Auto Mapper uses profiles to help understand the source and the destination of what is mapping
     // in order to use the methods inside here we need to inherit from the profile class
     public class AutoMapperProfiles : Profile
     {
@@ -28,6 +28,7 @@ namespace DatingApp.API.Helpers
             CreateMap<UserForUpdateDto, User>();
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<PhotoForCreationDto, Photo>();
+            CreateMap<UserForRegisterDto, User>();
         }
     }
 }

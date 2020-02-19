@@ -37,7 +37,7 @@ namespace DatingApp.API.Controllers
             return Ok(userToReturn);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> getUser(int id)
         {
             var user = await _repo.GetUser(id);
@@ -59,7 +59,7 @@ namespace DatingApp.API.Controllers
                 return Unauthorized();
             }
 
-            // get user from repository
+            // get user from repo
             var userFromRepo = await _repo.GetUser(id);
 
             // then we need to take the information thats in our userForUpdateDto and map it into userFromRepo
